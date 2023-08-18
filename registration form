@@ -1,0 +1,50 @@
+procedure TUniForm3.UniButton5Click(Sender: TObject);
+var
+  s: string;
+begin
+  VRHR.Active := False;
+  VRHR.SQL.Clear;
+  VRHR.SQL.Add('SELECT [company],[company_discription],[city],[phone_number],[email],[password] FROM [hh].[dbo].[companies]');
+  VRHR.Active := True;
+  if (UniEdit7.Text = '') or (UniEdit9.Text = '') or (UniNumberEdit2.Text = '') or (UniEdit10.Text = '') or (UniEdit11.Text = '') then
+  begin
+    uniSweetAlert1.AlertType := atWarning;
+    uniSweetAlert1.Title := 'Заполните все обязательные поля';
+    UniSweetAlert1.Show();
+    Exit;
+  end;
+  if (UniNumberEdit2.Text <> '') and ((Length(UniNumberEdit2.Text) < 11) or (Length(UniNumberEdit2.Text) > 11)) then
+  begin
+    UniSweetAlert1.AlertType := atWarning;
+    UniSweetAlert1.Title := 'Номер телефона введен некорректно';
+    UniSweetAlert1.Show();
+    Exit;
+  end;
+  if (UniNumberEdit2.Text <> '') and (Length(UniNumberEdit2.Text) = 11) and (UniNumberEdit2.Text[1] <> '8') then
+  begin
+    UniSweetAlert1.AlertType := atWarning;
+    UniSweetAlert1.Title := 'Номер телефона должен начинаться с "8"';
+    UniSweetAlert1.Show();
+    Exit;
+  end;
+  if (UniEdit11.Text <> '') and (Length(UniEdit11.Text) < 8) then
+  begin
+    UniSweetAlert1.AlertType := atWarning;
+    UniSweetAlert1.Title := 'Пароль не может быть меньше 8 символов!';
+    UniSweetAlert1.Show();
+    Exit;
+  end;
+  VRHR.Insert;
+  VRHR.FieldByName('company').AsString := UniEdit7.Text;
+  VRHR.FieldByName('city').AsString := UniEdit9.Text;
+  VRHR.FieldByName('phone_number').AsString := UninumberEdit2.Text;
+  VRHR.FieldByName('email').AsString := UniEdit10.Text;
+  s := StringReplace(UniMemo1.Text, #13, '$', [rfReplaceAll, rfIgnoreCase]);
+  VRHR.FieldByName('company_discription').AsString := s;
+  VRHR.FieldByName('password').AsString := UniEdit11.Text;
+  VRHR.Post;
+  success.AlertType := atSuccess;
+  success.Title := 'Регистрация прошла успешно!';
+  success.Show();
+  Close;
+end;
