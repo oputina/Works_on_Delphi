@@ -1,0 +1,49 @@
+procedure TUniForm10.UniButton1Click(Sender: TObject);
+var
+  s: string;
+begin
+  VRresume.Last;
+  VRresume.Edit;
+  VRresume.FieldByName('position').AsString := UniEdit1.Text;
+  VRresume.FieldByName('salary').AsInteger := StrToInt(UniNumberEdit1.Text);
+  VRresume.FieldByName('city').AsString := UniEdit5.Text;
+  VRresume.FieldByName('shedule').AsString := UniComboBox1.Items.Strings[UniComboBox1.ItemIndex];
+  VRresume.FieldByName('education').AsString := UniComboBox2.Items.Strings[UniComboBox2.ItemIndex];
+  VRresume.FieldByName('ID_job_seeker').AsInteger := MainForm.GLOBAL_USER;
+  VRresume.FieldByName('status').AsBoolean := True;
+  s := StringReplace(UniMemo2.Text, #13, '$', [rfReplaceAll, rfIgnoreCase]);
+  VRresume.FieldByName('about_me').AsString := s;
+  VRresume.FieldByName('phone_number').AsString := UniNumberEdit2.Text;
+  VRresume.FieldByName('email').AsString := UniEdit6.Text;
+  VRjobs.Active := False;
+  VRjobs.SQL.Clear;
+  VRjobs.SQL.Add('SELECT * FROM [hh].[dbo].[jobs] where ID_resume=' + IntToStr(VRresume.FieldByName('ID_resume').AsInteger));
+  VRjobs.Active := True;
+  if (UniRadioGroup1.ItemIndex = 1) and (VRjobs.RecordCount <> 0) then
+  begin
+    VRresume.FieldByName('work_experience').AsBoolean := True;
+    VRresume.post;
+    success.AlertType := atSuccess;
+    success.Title := 'Сохранено!';
+    success.Show();
+    UniForm5.resumeTimer.Enabled := True;
+    UniForm10.Close();
+  end;
+  if (UniRadioGroup1.ItemIndex = 1) and (VRjobs.RecordCount = 0) then
+  begin
+    warning.AlertType := atWarning;
+    warning.Title := 'Заполните предыдущие места работы!';
+    warning.Show();
+    VRresume.FieldByName('work_experience').AsBoolean := false;
+  end;
+  if UniRadioGroup1.ItemIndex = 0 then
+  begin
+    VRresume.FieldByName('work_experience').AsBoolean := False;
+    VRresume.post;
+    success.AlertType := atSuccess;
+    success.Title := 'Сохранено!';
+    success.Show();
+    UniForm5.resumeTimer.Enabled := True;
+    UniForm10.Close();
+  end;
+end;
