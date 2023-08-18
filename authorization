@@ -1,0 +1,75 @@
+procedure TUniForm1.UniButton3Click(Sender: TObject);
+begin
+  ADOQuery1.Active := False;
+  ADOQuery1.SQL.Clear;
+  // соискатели
+  if MainForm.start.Tag = 0 then
+  begin
+    ADOQuery1.SQL.Add('SELECT * FROM [hh].[dbo].[job_seekers] where [phone_number]=' + QuotedStr(UniEdit1.Text) + 'or [email]=' + QuotedStr(UniEdit1.Text));
+    ADOQuery1.Active := True;
+    if ADOQuery1.RecordCount > 0 then
+    begin
+      ADOQuery1.Active := False;
+      ADOQuery1.SQL.Clear;
+      ADOQuery1.SQL.Add('SELECT * FROM [hh].[dbo].[job_seekers] where [password]=' + QuotedStr(UniEdit2.Text) + ' and ([phone_number]=' + QuotedStr(UniEdit1.Text) + 'or [email]=' + QuotedStr(UniEdit1.Text) + ')');
+      ADOQuery1.Active := True;
+      if ADOQuery1.RecordCount > 0 then
+      begin
+        MainForm.GLOBAL_USER := ADOQuery1.FieldByName('ID_job_seeker').AsInteger;
+      end
+      else
+      begin
+        uniSweetAlert1.AlertType := atError;
+        uniSweetAlert1.Title := 'Неверный пароль!';
+        UniSweetAlert1.Show();
+        Exit;
+      end;
+    end
+    else
+    begin
+      uniSweetAlert1.AlertType := atError;
+      uniSweetAlert1.Title := 'Пользователь не найден!';
+      UniSweetAlert1.Show();
+      Exit;
+    end;
+    UniForm5.ShowModal();
+    UniForm5.UniTimer1.Enabled := True;
+    MainForm.start.Enabled := True;
+  end;
+
+  // работодатели
+  if MainForm.start.Tag = 1 then
+  begin
+    ADOQuery1.SQL.Add('SELECT * FROM [hh].[dbo].[companies] where [phone_number]=' + QuotedStr(UniEdit1.Text) + 'or [email]=' + QuotedStr(UniEdit1.Text));
+    ADOQuery1.Active := True;
+    if ADOQuery1.RecordCount > 0 then
+    begin
+      ADOQuery1.Active := False;
+      ADOQuery1.SQL.Clear;
+      ADOQuery1.SQL.Add('SELECT * FROM [hh].[dbo].[companies] where [password]=' + QuotedStr(UniEdit2.Text) + ' and ([phone_number]=' + QuotedStr(UniEdit1.Text) + 'or [email]=' + QuotedStr(UniEdit1.Text) + ')');
+      ADOQuery1.Active := True;
+      if ADOQuery1.RecordCount > 0 then
+      begin
+        MainForm.GLOBAL_USER_HR := ADOQuery1.FieldByName('ID_company').AsInteger;
+      end
+      else
+      begin
+        uniSweetAlert1.AlertType := atError;
+        uniSweetAlert1.Title := 'Неверный пароль!';
+        UniSweetAlert1.Show();
+        Exit;
+      end;
+    end
+    else
+    begin
+      uniSweetAlert1.AlertType := atError;
+      uniSweetAlert1.Title := 'Пользователь не найден!';
+      UniSweetAlert1.Show();
+      Exit;
+    end;
+    UniForm11.vacancies.Enabled := True;
+    Uniform11.ShowModal();
+    MainForm.sheet2.Enabled := True;
+  end;
+  Close;
+end;
